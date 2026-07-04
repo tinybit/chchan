@@ -495,6 +495,24 @@ table.admin button {
   margin-bottom: 28px;
 }
 
+.lang-pills {
+  display: flex;
+  gap: 4px;
+  margin: 4px 0 12px;
+}
+
+.lang-pills button {
+  margin: 0;
+  padding: 5px 18px;
+  font-weight: bold;
+}
+
+.lang-pills button.active {
+  background: #fff;
+  color: var(--link);
+  border-color: var(--border);
+}
+
 .rich-editor-frame {
   border: 1px solid var(--border);
   background: #fff;
