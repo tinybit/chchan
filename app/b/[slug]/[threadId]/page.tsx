@@ -60,7 +60,7 @@ export default async function ThreadPage({
           unwatchLabel={t.thread.unwatch}
         />
         {user.isAdmin && (
-          <form action={lockThread} style={{ display: "inline", marginLeft: 12 }}>
+          <form action={lockThread} style={{ display: "inline" }}>
             <input type="hidden" name="threadId" value={thread.id} />
             <input type="hidden" name="backPath" value={threadPath} />
             <button className="linkish" type="submit">

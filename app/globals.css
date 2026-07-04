@@ -167,6 +167,15 @@ h1 {
   color: var(--green);
 }
 
+/* Space out the action links (report / reply / hide / delete / ban). */
+.post-meta form {
+  margin-left: 10px;
+}
+
+.post-meta > .linkish {
+  margin-left: 10px;
+}
+
 .post-body {
   white-space: pre-wrap;
 }
@@ -362,10 +371,14 @@ button.linkish:hover {
 
 .toolbar {
   margin: 12px 0 4px;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 
 .watch-toggle {
-  margin-left: 12px;
+  margin: 0;
 }
 
 .you-tag {
