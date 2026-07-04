@@ -20,11 +20,13 @@ export default async function BoardPage({
   const [lang, t] = await Promise.all([getLang(), getT()]);
 
   const { rows: boards } = await db.query(
-    "select id, slug, name, description, name_ru, description_ru from boards where slug = $1",
+    "select id, slug, name, description, name_ru, description_ru, archived from boards where slug = $1",
     [slug],
   );
   if (boards.length === 0) notFound();
   const board = boards[0];
+  // Archived boards exist only for root (to prepare content before unarchiving).
+  if (board.archived && user.role !== "root") notFound();
 
   // Each thread with its OP post and reply count, newest bump first.
   const { rows: threads } = await db.query(

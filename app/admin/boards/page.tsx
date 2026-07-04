@@ -1,47 +1,8 @@
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
-import { getT, type Dict } from "@/lib/i18n";
-import { createBoard, updateBoard } from "@/lib/actions";
-
-function BoardFields({
-  t,
-  board,
-}: {
-  t: Dict;
-  board?: {
-    name: string;
-    name_ru: string;
-    description: string;
-    description_ru: string;
-    position: number;
-  };
-}) {
-  return (
-    <>
-      <label>
-        <span className="muted">{t.admin.nameEn}</span>
-        <input name="name" type="text" defaultValue={board?.name ?? ""} required />
-      </label>
-      <label>
-        <span className="muted">{t.admin.nameRu}</span>
-        <input name="nameRu" type="text" defaultValue={board?.name_ru ?? ""} />
-      </label>
-      <label>
-        <span className="muted">{t.admin.descEn}</span>
-        <input name="description" type="text" defaultValue={board?.description ?? ""} />
-      </label>
-      <label>
-        <span className="muted">{t.admin.descRu}</span>
-        <input name="descriptionRu" type="text" defaultValue={board?.description_ru ?? ""} />
-      </label>
-      <label className="narrow">
-        <span className="muted">{t.admin.position}</span>
-        <input name="position" type="number" defaultValue={board?.position ?? 0} />
-      </label>
-    </>
-  );
-}
+import { getT } from "@/lib/i18n";
+import { BoardsManager, type BoardItem } from "@/components/BoardsManager";
 
 export default async function BoardsAdminPage({
   searchParams,
@@ -53,31 +14,43 @@ export default async function BoardsAdminPage({
   const { error } = await searchParams;
   const t = await getT();
 
-  const { rows: boards } = await db.query(
-    `select id, slug, name, name_ru, description, description_ru, position
+  const { rows } = await db.query(
+    `select id, slug, name, name_ru, description, description_ru, archived
      from boards order by position, id`,
   );
+  const boards: BoardItem[] = rows.map((b) => ({
+    id: String(b.id),
+    slug: b.slug,
+    name: b.name,
+    name_ru: b.name_ru,
+    description: b.description,
+    description_ru: b.description_ru,
+    archived: b.archived,
+  }));
 
   return (
     <>
       {error && <div className="error">{error}</div>}
-      {boards.map((b) => (
-        <form className="board-edit" action={updateBoard} key={b.id}>
-          <input type="hidden" name="boardId" value={b.id} />
-          <span className="board-slug">/{b.slug}/</span>
-          <BoardFields t={t} board={b} />
-          <button type="submit">{t.admin.save}</button>
-        </form>
-      ))}
-      <h3>{t.admin.newBoard}</h3>
-      <form className="board-edit" action={createBoard}>
-        <label className="narrow">
-          <span className="muted">{t.admin.slug}</span>
-          <input name="slug" type="text" maxLength={10} pattern="[a-z0-9]{1,10}" required />
-        </label>
-        <BoardFields t={t} />
-        <button type="submit">{t.admin.create}</button>
-      </form>
+      <BoardsManager
+        boards={boards}
+        labels={{
+          newBoard: t.admin.newBoard,
+          editBoard: t.admin.editBoard,
+          slug: t.admin.slug,
+          nameEn: t.admin.nameEn,
+          nameRu: t.admin.nameRu,
+          descEn: t.admin.descEn,
+          descRu: t.admin.descRu,
+          save: t.admin.save,
+          create: t.admin.create,
+          edit: t.admin.edit,
+          cancel: t.admin.cancel,
+          archive: t.admin.archive,
+          unarchive: t.admin.unarchive,
+          archivedBadge: t.admin.archivedBadge,
+          dragHint: t.admin.dragHint,
+        }}
+      />
     </>
   );
 }

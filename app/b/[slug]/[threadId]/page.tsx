@@ -19,13 +19,14 @@ export default async function ThreadPage({
   const t = await getT();
 
   const { rows: threads } = await db.query(
-    `select t.id, t.subject, t.locked, b.slug, b.name
+    `select t.id, t.subject, t.locked, b.slug, b.name, b.archived
      from threads t join boards b on b.id = t.board_id
      where t.id = $1 and b.slug = $2 and t.deleted_at is null`,
     [threadId, slug],
   );
   if (threads.length === 0) notFound();
   const thread = threads[0];
+  if (thread.archived && user.role !== "root") notFound();
   const threadPath = `/b/${slug}/${threadId}`;
 
   const { rows: posts } = await db.query(

@@ -377,47 +377,106 @@ table.admin button {
   font-weight: bold;
 }
 
-.board-edit {
+.board-list {
+  max-width: 900px;
+}
+
+.board-row {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 10px;
-  flex-wrap: wrap;
   background: var(--post-bg);
   border: 1px solid var(--border);
-  padding: 10px 12px;
-  margin: 8px 0;
-  max-width: 980px;
+  padding: 8px 12px;
+  margin: 6px 0;
+  cursor: grab;
 }
 
-.board-edit .board-slug {
+.board-row.dragging {
+  opacity: 0.4;
+}
+
+.board-row.drag-over {
+  border-top: 2px solid var(--link);
+}
+
+.board-row .drag-handle {
+  color: var(--muted);
+  cursor: grab;
+  user-select: none;
+}
+
+.board-row .board-slug {
   font-weight: bold;
-  min-width: 44px;
-  padding-bottom: 6px;
+  min-width: 40px;
 }
 
-.board-edit label {
+.board-row .board-names {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.board-row .row-spacer {
+  flex: 1;
+}
+
+.board-row button {
+  margin-top: 0;
+  flex-shrink: 0;
+}
+
+.badge {
+  background: var(--btn-hover);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+  padding: 1px 8px;
+  flex-shrink: 0;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 20px 24px;
+  width: min(520px, 92vw);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal h3 {
+  margin-top: 0;
+}
+
+.modal-form label {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  flex: 1;
-  min-width: 150px;
+  margin: 10px 0;
 }
 
-.board-edit label.narrow {
-  flex: 0 0 70px;
-  min-width: 70px;
-}
-
-.board-edit input {
-  padding: 5px;
+.modal-form input {
+  padding: 6px;
   border: 1px solid var(--border);
   background: #fff;
   font: inherit;
-  width: 100%;
 }
 
-.board-edit button {
-  margin-top: 0;
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
 }
 
 .login-page {

@@ -43,8 +43,13 @@ export async function createThread(formData: FormData): Promise<void> {
   if (!subject || subject.length > MAX_SUBJECT) fail(boardPath, t.errors.subjectRequired);
   if (!body || body.length > MAX_BODY) fail(boardPath, t.errors.bodyRequired);
 
-  const { rows: boards } = await db.query("select id from boards where slug = $1", [boardSlug]);
-  if (boards.length === 0) fail("/", t.errors.noBoard);
+  const { rows: boards } = await db.query(
+    "select id, archived from boards where slug = $1",
+    [boardSlug],
+  );
+  if (boards.length === 0 || (boards[0].archived && user.role !== "root")) {
+    fail("/", t.errors.noBoard);
+  }
   await checkRateLimit(user.id, "thread").catch(() => fail(boardPath, t.errors.rateLimit));
 
   const { rows: threads } = await db.query(
@@ -71,11 +76,13 @@ export async function createReply(formData: FormData): Promise<void> {
   const file = formData.get("image") as File | null;
 
   const { rows: threads } = await db.query(
-    `select t.id, t.locked, b.slug from threads t join boards b on b.id = t.board_id
+    `select t.id, t.locked, b.slug, b.archived from threads t join boards b on b.id = t.board_id
      where t.id = $1 and t.deleted_at is null`,
     [threadId],
   );
-  if (threads.length === 0) fail("/", t.errors.noThread);
+  if (threads.length === 0 || (threads[0].archived && user.role !== "root")) {
+    fail("/", t.errors.noThread);
+  }
   const threadPath = `/b/${threads[0].slug}/${threadId}`;
 
   if (threads[0].locked) fail(threadPath, t.errors.threadLocked);
@@ -235,10 +242,10 @@ function boardFields(formData: FormData) {
     nameRu: String(formData.get("nameRu") ?? "").trim(),
     description: String(formData.get("description") ?? "").trim(),
     descriptionRu: String(formData.get("descriptionRu") ?? "").trim(),
-    position: Number(formData.get("position") ?? 0) || 0,
   };
 }
 
+/** New boards start archived (hidden from members) at the top of the list. */
 export async function createBoard(formData: FormData): Promise<void> {
   const root = await requireRoot();
   const t = await getT();
@@ -248,11 +255,12 @@ export async function createBoard(formData: FormData): Promise<void> {
   if (!f.name) fail("/admin/boards", t.errors.nameRequired);
 
   const { rows } = await db.query(
-    `insert into boards (slug, name, description, name_ru, description_ru, position)
-     values ($1, $2, $3, $4, $5, $6)
+    `insert into boards (slug, name, description, name_ru, description_ru, position, archived)
+     values ($1, $2, $3, $4, $5,
+             (select coalesce(min(position), 1) - 1 from boards), true)
      on conflict (slug) do nothing
      returning id`,
-    [slug, f.name, f.description, f.nameRu, f.descriptionRu, f.position],
+    [slug, f.name, f.description, f.nameRu, f.descriptionRu],
   );
   if (rows.length === 0) fail("/admin/boards", t.errors.slugTaken);
   await logMod(root.id, "create-board", "board", String(rows[0].id), `/${slug}/`);
@@ -268,15 +276,51 @@ export async function updateBoard(formData: FormData): Promise<void> {
   if (!f.name) fail("/admin/boards", t.errors.nameRequired);
 
   const { rows } = await db.query(
-    `update boards set name = $1, description = $2, name_ru = $3, description_ru = $4, position = $5
-     where id = $6 returning slug`,
-    [f.name, f.description, f.nameRu, f.descriptionRu, f.position, boardId],
+    `update boards set name = $1, description = $2, name_ru = $3, description_ru = $4
+     where id = $5 returning slug`,
+    [f.name, f.description, f.nameRu, f.descriptionRu, boardId],
   );
   if (rows.length > 0) {
     await logMod(root.id, "update-board", "board", boardId, `/${rows[0].slug}/`);
   }
   revalidatePath("/admin/boards");
   redirect("/admin/boards");
+}
+
+export async function setBoardArchived(formData: FormData): Promise<void> {
+  const root = await requireRoot();
+  const boardId = String(formData.get("boardId") ?? "");
+  const archived = String(formData.get("archived") ?? "") === "1";
+  const { rows } = await db.query(
+    "update boards set archived = $1 where id = $2 returning slug",
+    [archived, boardId],
+  );
+  if (rows.length > 0) {
+    await logMod(
+      root.id,
+      archived ? "archive-board" : "unarchive-board",
+      "board",
+      boardId,
+      `/${rows[0].slug}/`,
+    );
+  }
+  revalidatePath("/admin/boards");
+  redirect("/admin/boards");
+}
+
+/** Called from the drag-and-drop list with the full board id order. */
+export async function reorderBoards(ids: string[]): Promise<void> {
+  await requireRoot();
+  if (!Array.isArray(ids) || ids.length === 0 || ids.length > 200) return;
+  await db.query(
+    `update boards b set position = u.pos
+     from (select unnest($1::bigint[]) as id,
+                  generate_subscripts($1::bigint[], 1) - 1 as pos) u
+     where b.id = u.id`,
+    [ids],
+  );
+  revalidatePath("/admin/boards");
+  revalidatePath("/");
 }
 
 /**

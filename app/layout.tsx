@@ -14,7 +14,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const [user, lang, t] = await Promise.all([getSessionUser(), getLang(), getT()]);
   const approved = user?.status === "approved";
   const boards = approved
-    ? (await db.query("select slug, name from boards order by position, id")).rows
+    ? (
+        await db.query(
+          "select slug, name from boards where not archived order by position, id",
+        )
+      ).rows
     : [];
 
   // Outsiders get a bare page: no nav, no board names, no hints.

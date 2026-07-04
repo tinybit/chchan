@@ -11,7 +11,7 @@ export default async function HomePage() {
   const { rows: boards } = await db.query(
     `select b.slug, b.name, b.description, b.name_ru, b.description_ru,
             (select count(*) from threads t where t.board_id = b.id and t.deleted_at is null) as threads
-     from boards b order by b.position, b.id`,
+     from boards b where not b.archived order by b.position, b.id`,
   );
 
   return (
