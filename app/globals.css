@@ -110,9 +110,10 @@ h1 {
   margin: 10px 0 0;
 }
 
-/* Centered column under the hero, text stays left-aligned inside. */
+/* Centered column under the hero, sized to content, text left-aligned inside. */
 .home-boards {
-  max-width: 480px;
+  width: fit-content;
+  max-width: min(640px, 92vw);
   margin: 0 auto;
 }
 
