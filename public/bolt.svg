@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 124 189">
+  <defs>
+    <linearGradient id="bolt" gradientUnits="userSpaceOnUse" x1="48.9124" y1="235.6292" x2="72.3371" y2="23.9901" gradientTransform="matrix(1 0 0 -1 0 196.6667)">
+      <stop offset="0" stop-color="#FFA90A"/>
+      <stop offset="0.2518" stop-color="#FFA00D"/>
+      <stop offset="0.6689" stop-color="#FE8616"/>
+      <stop offset="0.9944" stop-color="#FE6E1F"/>
+    </linearGradient>
+  </defs>
+  <polygon fill="url(#bolt)" points="123.8,61.8 75.7,61.8 107.3,0.6 45.3,0.6 0.2,97.3 49.8,97.3 25.9,188.5"/>
+</svg>

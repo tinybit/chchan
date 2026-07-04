@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { guardApproved } from "@/lib/guard";
 import { createThread } from "@/lib/actions";
+import { getLang, getT } from "@/lib/i18n";
+import { boardName, boardDescription } from "@/lib/boards";
 import { Post, type PostRow } from "@/components/Post";
 
 export default async function BoardPage({
@@ -15,9 +17,10 @@ export default async function BoardPage({
   const user = await guardApproved();
   const { slug } = await params;
   const { error, notice } = await searchParams;
+  const [lang, t] = await Promise.all([getLang(), getT()]);
 
   const { rows: boards } = await db.query(
-    "select id, slug, name, description from boards where slug = $1",
+    "select id, slug, name, description, name_ru, description_ru from boards where slug = $1",
     [slug],
   );
   if (boards.length === 0) notFound();
@@ -43,37 +46,37 @@ export default async function BoardPage({
   return (
     <main>
       <h1>
-        /{board.slug}/ - {board.name}
+        /{board.slug}/ - {boardName(board, lang)}
       </h1>
-      <p className="muted">{board.description}</p>
+      <p className="muted">{boardDescription(board, lang)}</p>
       {error && <div className="error">{error}</div>}
       {notice && <div className="notice">{notice}</div>}
 
       <form className="compose" action={createThread}>
-        <h3>New thread</h3>
+        <h3>{t.board.newThread}</h3>
         <input type="hidden" name="board" value={board.slug} />
-        <label htmlFor="subject">Subject</label>
+        <label htmlFor="subject">{t.board.subject}</label>
         <input id="subject" name="subject" type="text" maxLength={120} required />
-        <label htmlFor="body">Comment</label>
+        <label htmlFor="body">{t.board.comment}</label>
         <textarea id="body" name="body" maxLength={8000} required />
-        <label htmlFor="image">Image (optional, max 8 MB)</label>
+        <label htmlFor="image">{t.board.image}</label>
         <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/gif,image/webp" />
-        <button type="submit">Post thread</button>
+        <button type="submit">{t.board.postThread}</button>
       </form>
 
-      {threads.map((t) => (
-        <div className="thread" key={t.thread_id}>
+      {threads.map((th) => (
+        <div className="thread" key={th.thread_id}>
           <h3>
-            <Link href={`/b/${board.slug}/${t.thread_id}`}>{t.subject}</Link>
-            {t.locked ? " [locked]" : ""}
+            <Link href={`/b/${board.slug}/${th.thread_id}`}>{th.subject}</Link>
+            {th.locked ? t.board.locked : ""}
           </h3>
-          <Post post={t as PostRow} backPath={`/b/${board.slug}`} isAdmin={user.isAdmin} />
-          <Link href={`/b/${board.slug}/${t.thread_id}`}>
-            {t.replies} {Number(t.replies) === 1 ? "reply" : "replies"}
+          <Post post={th as PostRow} backPath={`/b/${board.slug}`} isAdmin={user.isAdmin} />
+          <Link href={`/b/${board.slug}/${th.thread_id}`}>
+            {t.board.replies(Number(th.replies))}
           </Link>
         </div>
       ))}
-      {threads.length === 0 && <p className="muted">No threads yet. Start one.</p>}
+      {threads.length === 0 && <p className="muted">{t.board.noThreads}</p>}
     </main>
   );
 }

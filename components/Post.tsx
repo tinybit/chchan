@@ -1,6 +1,8 @@
 import { banAuthorOfPost, deletePost, hidePost, reportPost } from "@/lib/actions";
 import { formatDate } from "@/lib/dates";
+import { getT } from "@/lib/i18n";
 import { publicUrl } from "@/lib/storage";
+import { PostImage } from "./PostImage";
 
 export type PostRow = {
   id: string;
@@ -24,7 +26,7 @@ function Body({ text }: { text: string }) {
   );
 }
 
-export function Post({
+export async function Post({
   post,
   backPath,
   isAdmin,
@@ -33,19 +35,20 @@ export function Post({
   backPath: string;
   isAdmin: boolean;
 }) {
+  const t = await getT();
   const hiddenForUser = post.hidden && !isAdmin;
   return (
     <div className="post" id={`p${post.id}`}>
       <div className="post-meta">
         <span className="label">{post.author_label}</span>{" "}
         {formatDate(post.created_at)} No.{post.id}
-        {post.hidden && isAdmin && <b> [hidden]</b>}{" "}
+        {post.hidden && isAdmin && <b>{t.post.hiddenTag}</b>}{" "}
         <form action={reportPost} style={{ display: "inline" }}>
           <input type="hidden" name="postId" value={post.id} />
           <input type="hidden" name="reason" value="report" />
           <input type="hidden" name="backPath" value={backPath} />
           <button className="linkish" type="submit">
-            report
+            {t.post.report}
           </button>
         </form>
         {isAdmin && (
@@ -55,34 +58,36 @@ export function Post({
               <input type="hidden" name="postId" value={post.id} />
               <input type="hidden" name="backPath" value={backPath} />
               <button className="linkish" type="submit">
-                {post.hidden ? "unhide" : "hide"}
+                {post.hidden ? t.post.unhide : t.post.hide}
               </button>
             </form>{" "}
             <form action={deletePost} style={{ display: "inline" }}>
               <input type="hidden" name="postId" value={post.id} />
               <input type="hidden" name="backPath" value={backPath} />
               <button className="linkish" type="submit">
-                delete
+                {t.post.del}
               </button>
             </form>{" "}
             <form action={banAuthorOfPost} style={{ display: "inline" }}>
               <input type="hidden" name="postId" value={post.id} />
+              <input type="hidden" name="backPath" value={backPath} />
               <button className="linkish" type="submit">
-                ban author
+                {t.post.banAuthor}
               </button>
             </form>
           </>
         )}
       </div>
       {hiddenForUser ? (
-        <div className="muted">[post hidden by moderators]</div>
+        <div className="muted">{t.post.hiddenByMods}</div>
       ) : (
         <>
           {post.thumb_key && post.storage_key && (
             <div className="post-img">
-              <a href={publicUrl(post.storage_key)} target="_blank" rel="noreferrer">
-                <img src={publicUrl(post.thumb_key)} alt="" />
-              </a>
+              <PostImage
+                thumbSrc={publicUrl(post.thumb_key)}
+                fullSrc={publicUrl(post.storage_key)}
+              />
             </div>
           )}
           <Body text={post.body} />

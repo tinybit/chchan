@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { guardApproved } from "@/lib/guard";
 import { createReply, lockThread } from "@/lib/actions";
+import { getT } from "@/lib/i18n";
 import { Post, type PostRow } from "@/components/Post";
 
 export default async function ThreadPage({
@@ -15,6 +16,7 @@ export default async function ThreadPage({
   const user = await guardApproved();
   const { slug, threadId } = await params;
   const { error, notice } = await searchParams;
+  const t = await getT();
 
   const { rows: threads } = await db.query(
     `select t.id, t.subject, t.locked, b.slug, b.name
@@ -36,21 +38,21 @@ export default async function ThreadPage({
 
   return (
     <main>
-      <p>
-        <Link href={`/b/${slug}`}>&laquo; back to /{slug}/</Link>
-      </p>
-      <h1>
-        {thread.subject}
-        {thread.locked ? " [locked]" : ""}
+      <div className="toolbar">
+        <Link href={`/b/${slug}`}>{t.thread.backTo(slug)}</Link>
         {user.isAdmin && (
           <form action={lockThread} style={{ display: "inline", marginLeft: 12 }}>
             <input type="hidden" name="threadId" value={thread.id} />
             <input type="hidden" name="backPath" value={threadPath} />
             <button className="linkish" type="submit">
-              {thread.locked ? "unlock" : "lock"}
+              {thread.locked ? t.thread.unlock : t.thread.lock}
             </button>
           </form>
         )}
+      </div>
+      <h1>
+        {thread.subject}
+        {thread.locked ? t.board.locked : ""}
       </h1>
       {error && <div className="error">{error}</div>}
       {notice && <div className="notice">{notice}</div>}
@@ -61,13 +63,13 @@ export default async function ThreadPage({
 
       {!thread.locked && (
         <form className="compose" action={createReply}>
-          <h3>Reply</h3>
+          <h3>{t.thread.reply}</h3>
           <input type="hidden" name="threadId" value={thread.id} />
-          <label htmlFor="body">Comment</label>
+          <label htmlFor="body">{t.board.comment}</label>
           <textarea id="body" name="body" maxLength={8000} required />
-          <label htmlFor="image">Image (optional, max 8 MB)</label>
+          <label htmlFor="image">{t.board.image}</label>
           <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/gif,image/webp" />
-          <button type="submit">Post reply</button>
+          <button type="submit">{t.thread.postReply}</button>
         </form>
       )}
     </main>

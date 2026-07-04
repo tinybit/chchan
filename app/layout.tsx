@@ -3,14 +3,15 @@ import Link from "next/link";
 import "./globals.css";
 import { getSessionUser } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { getLang, getT } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "ChChan",
-  description: "Membership-gated anonymous board. Unofficial.",
+  description: "ChChan",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const user = await getSessionUser();
+  const [user, lang, t] = await Promise.all([getSessionUser(), getLang(), getT()]);
   const approved = user?.status === "approved";
   const boards = approved
     ? (await db.query("select slug, name from boards order by position, id")).rows
@@ -18,11 +19,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   // Outsiders get a bare page: no nav, no board names, no hints.
   return (
-    <html lang="en">
+    <html lang={lang}>
       <body>
         <header className="site">
           <Link href="/" className="logo">
-            ChChan
+            {t.siteName}
           </Link>
           {approved && (
             <nav>
@@ -35,12 +36,26 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           )}
           <span className="spacer" />
           <nav>
-            {approved && <Link href="/rules">rules</Link>}
-            {approved && user?.isAdmin && <Link href="/admin">admin</Link>}
+            <a
+              className={`flag${lang === "ru" ? " active" : ""}`}
+              href="/api/lang?code=ru"
+              title="Русский"
+            >
+              🇷🇺
+            </a>
+            <a
+              className={`flag${lang === "en" ? " active" : ""}`}
+              href="/api/lang?code=en"
+              title="English"
+            >
+              🇺🇸
+            </a>
+            {approved && <Link href="/rules">{t.nav.rules}</Link>}
+            {approved && user?.isAdmin && <Link href="/admin">{t.nav.admin}</Link>}
             {user && (
               <form action="/api/auth/logout" method="post" style={{ display: "inline" }}>
                 <button className="linkish" type="submit">
-                  logout
+                  {t.nav.logout}
                 </button>
               </form>
             )}

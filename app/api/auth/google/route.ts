@@ -16,14 +16,15 @@ export async function GET(): Promise<NextResponse> {
     maxAge: 600,
   });
 
+  // No hd param here on purpose: it would lock Google's sign-in form to the
+  // workspace domain and block the root Gmail account. Domain enforcement
+  // happens in the callback against the verified token claims.
   const params = new URLSearchParams({
     client_id: clientId,
     redirect_uri: `${process.env.APP_URL}/api/auth/callback`,
     response_type: "code",
     scope: "openid email",
     state,
-    // Cosmetic filter only; the real check is the hd claim in the callback.
-    hd: process.env.ALLOWED_EMAIL_DOMAIN ?? "",
     prompt: "select_account",
   });
   return NextResponse.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`);
