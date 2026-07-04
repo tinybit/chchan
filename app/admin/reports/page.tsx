@@ -24,7 +24,10 @@ export default async function ReportsPage({
       {reports.map((r) => (
         <div className="post" key={r.id}>
           <div className="post-meta">
-            <span className="label">{r.author_label}</span> {t.admin.postNo}
+            <span className="label">
+              {t.post.anon} {r.author_label}
+            </span>{" "}
+            {t.admin.postNo}
             {r.post_id}
             {r.hidden && <b>{t.post.hiddenTag}</b>} &mdash; {t.admin.reportedOn}{" "}
             {formatDate(r.created_at)}

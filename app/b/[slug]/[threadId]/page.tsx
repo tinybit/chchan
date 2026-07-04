@@ -59,7 +59,13 @@ export default async function ThreadPage({
       {notice && <div className="notice">{notice}</div>}
 
       {posts.map((p) => (
-        <Post key={p.id} post={p as PostRow} backPath={threadPath} isAdmin={user.isAdmin} />
+        <Post
+          key={p.id}
+          post={p as PostRow}
+          backPath={threadPath}
+          isAdmin={user.isAdmin}
+          canReply={!thread.locked}
+        />
       ))}
 
       {!thread.locked && (

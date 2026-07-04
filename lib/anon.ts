@@ -9,6 +9,7 @@ export function authorHmac(userId: string, threadId: string): string {
   return createHmac("sha256", secret).update(`${userId}:${threadId}`).digest("hex");
 }
 
+/** Display suffix only; the localized "Anon"/"Анон" prefix is added at render. */
 export function authorLabel(hmac: string): string {
-  return `Anon ${hmac.slice(0, 6)}`;
+  return hmac.slice(0, 6);
 }

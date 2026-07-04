@@ -168,6 +168,17 @@ h1 {
   color: var(--green);
 }
 
+.quote-link {
+  color: var(--link);
+  text-decoration: underline;
+}
+
+/* Dvach's postbghighlight color, applied when a quote link is followed. */
+.post:target {
+  background: #eedacb;
+  border-color: #dbb68f;
+}
+
 .post-img {
   float: left;
   margin: 0 12px 6px 0;

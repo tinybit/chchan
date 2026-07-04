@@ -52,6 +52,8 @@ const en = {
     postReply: "Post reply",
   },
   post: {
+    anon: "Anon",
+    reply: "reply",
     report: "report",
     hide: "hide",
     unhide: "unhide",
@@ -170,6 +172,8 @@ const ru: Dict = {
     postReply: "Отправить",
   },
   post: {
+    anon: "Анон",
+    reply: "ответить",
     report: "жалоба",
     hide: "скрыть",
     unhide: "показать",
