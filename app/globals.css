@@ -110,6 +110,12 @@ h1 {
   margin: 10px 0 0;
 }
 
+/* Centered column under the hero, text stays left-aligned inside. */
+.home-boards {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
 .board-card {
   margin: 8px 0;
 }

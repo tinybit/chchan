@@ -17,18 +17,20 @@ export default async function HomePage() {
   return (
     <main>
       <Hero />
-      <h1>{t.home.boards}</h1>
-      {boards.length === 0 && <p className="muted">{t.home.noBoards}</p>}
-      {boards.map((b) => (
-        <div className="board-card" key={b.slug}>
-          <Link href={`/b/${b.slug}`}>
-            /{b.slug}/ - {boardName(b, lang)}
-          </Link>
-          <div className="muted">
-            {boardDescription(b, lang)} ({t.home.threads(Number(b.threads))})
+      <div className="home-boards">
+        <h1>{t.home.boards}</h1>
+        {boards.length === 0 && <p className="muted">{t.home.noBoards}</p>}
+        {boards.map((b) => (
+          <div className="board-card" key={b.slug}>
+            <Link href={`/b/${b.slug}`}>
+              /{b.slug}/ - {boardName(b, lang)}
+            </Link>
+            <div className="muted">
+              {boardDescription(b, lang)} ({t.home.threads(Number(b.threads))})
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </main>
   );
 }
