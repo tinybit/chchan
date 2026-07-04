@@ -74,4 +74,4 @@ Push to a Vercel project, provision a Neon Postgres database, set the environmen
 
 ## License
 
-Do whatever you want with it.
+MIT — see [LICENSE](LICENSE). Do whatever you want with it.
