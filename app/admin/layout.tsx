@@ -24,6 +24,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       ? [
           { href: "/admin/members", label: t.admin.members },
           { href: "/admin/boards", label: t.admin.boardsSection },
+          { href: "/admin/rules", label: t.admin.rulesTab },
         ]
       : []),
     { href: "/admin/log", label: t.admin.modLog },

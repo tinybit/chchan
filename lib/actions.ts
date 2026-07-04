@@ -124,7 +124,7 @@ export async function reportPost(formData: FormData): Promise<void> {
 async function logMod(
   adminId: string,
   action: string,
-  targetKind: "post" | "thread" | "user" | "board",
+  targetKind: "post" | "thread" | "user" | "board" | "content",
   targetId: string,
   note = "",
 ): Promise<void> {
@@ -321,6 +321,29 @@ export async function reorderBoards(ids: string[]): Promise<void> {
   );
   revalidatePath("/admin/boards");
   revalidatePath("/");
+}
+
+// --- Editable site content (rules page): root only. ---
+
+const CONTENT_KEYS = new Set(["rules_en", "rules_ru"]);
+const MAX_CONTENT_HTML = 200_000;
+
+export async function saveSiteContent(formData: FormData): Promise<void> {
+  const root = await requireRoot();
+  const key = String(formData.get("key") ?? "");
+  const html = String(formData.get("html") ?? "");
+  if (!CONTENT_KEYS.has(key) || html.length === 0 || html.length > MAX_CONTENT_HTML) {
+    redirect("/admin/rules");
+  }
+  await db.query(
+    `insert into site_content (key, html, updated_at) values ($1, $2, now())
+     on conflict (key) do update set html = excluded.html, updated_at = now()`,
+    [key, html],
+  );
+  await logMod(root.id, "update-content", "content", "0", key);
+  revalidatePath("/rules");
+  revalidatePath("/admin/rules");
+  redirect("/admin/rules");
 }
 
 /**

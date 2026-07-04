@@ -108,6 +108,9 @@ const en = {
     archivedBadge: "archived",
     editBoard: "Edit board",
     dragHint: "Drag boards to reorder. Archived boards are invisible to members.",
+    rulesTab: "Rules",
+    rulesRu: "Rules page (RU)",
+    rulesEn: "Rules page (EN)",
   },
   errors: {
     badSlug: "slug must be 1-10 lowercase letters or digits",
@@ -228,6 +231,9 @@ const ru: Dict = {
     archivedBadge: "архив",
     editBoard: "Править доску",
     dragHint: "Перетаскивай доски, чтобы менять порядок. Архивные доски не видны участникам.",
+    rulesTab: "Правила",
+    rulesRu: "Страница правил (RU)",
+    rulesEn: "Страница правил (EN)",
   },
   errors: {
     badSlug: "слаг: 1-10 строчных латинских букв или цифр",
