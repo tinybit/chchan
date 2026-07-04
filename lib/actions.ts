@@ -221,6 +221,16 @@ export async function deletePost(formData: FormData): Promise<void> {
   const postId = String(formData.get("postId") ?? "");
   const backPath = String(formData.get("backPath") ?? "/admin");
   await db.query("update posts set deleted_at = now() where id = $1", [postId]);
+  // Chan semantics: deleting the opening post kills the whole thread.
+  await db.query(
+    `update threads t set deleted_at = now()
+     from posts p
+     where p.id = $1
+       and t.id = p.thread_id
+       and t.deleted_at is null
+       and p.id = (select min(id) from posts where thread_id = t.id)`,
+    [postId],
+  );
   await logMod(admin.id, "delete", "post", postId);
   revalidatePath(backPath);
   redirect(backPath);
