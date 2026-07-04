@@ -5,6 +5,7 @@ import { guardApproved } from "@/lib/guard";
 import { createReply, lockThread } from "@/lib/actions";
 import { getT } from "@/lib/i18n";
 import { Post, type PostRow } from "@/components/Post";
+import { SubmitButton } from "@/components/SubmitButton";
 
 export default async function ThreadPage({
   params,
@@ -76,7 +77,7 @@ export default async function ThreadPage({
           <textarea id="body" name="body" maxLength={8000} required />
           <label htmlFor="image">{t.board.image}</label>
           <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/gif,image/webp" />
-          <button type="submit">{t.thread.postReply}</button>
+          <SubmitButton>{t.thread.postReply}</SubmitButton>
         </form>
       )}
     </main>

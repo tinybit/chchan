@@ -6,6 +6,7 @@ import { createThread } from "@/lib/actions";
 import { getLang, getT } from "@/lib/i18n";
 import { boardName, boardDescription } from "@/lib/boards";
 import { Post, type PostRow } from "@/components/Post";
+import { SubmitButton } from "@/components/SubmitButton";
 
 export default async function BoardPage({
   params,
@@ -63,7 +64,7 @@ export default async function BoardPage({
         <textarea id="body" name="body" maxLength={8000} required />
         <label htmlFor="image">{t.board.image}</label>
         <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/gif,image/webp" />
-        <button type="submit">{t.board.postThread}</button>
+        <SubmitButton>{t.board.postThread}</SubmitButton>
       </form>
 
       {threads.map((th) => (
