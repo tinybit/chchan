@@ -1,0 +1,233 @@
+/* Classic Yotsuba palette. */
+:root {
+  --bg: #ffffee;
+  --post-bg: #f0e0d6;
+  --post-border: #d9bfb7;
+  --text: #800000;
+  --body-text: #000000;
+  --link: #0000ee;
+  --accent: #cc1105;
+  --green: #789922;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--body-text);
+  font-family: arial, helvetica, sans-serif;
+  font-size: 14px;
+  margin: 0;
+  padding: 0 12px 40px;
+}
+
+a {
+  color: var(--link);
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+header.site {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--post-border);
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+header.site .logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--text);
+  text-decoration: none;
+}
+
+header.site nav {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+header.site .spacer {
+  flex: 1;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--text);
+}
+
+.board-card {
+  margin: 8px 0;
+}
+
+.board-card a {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.thread,
+.post {
+  background: var(--post-bg);
+  border: 1px solid var(--post-border);
+  padding: 8px 12px;
+  margin: 6px 0;
+  max-width: 900px;
+  overflow-wrap: anywhere;
+}
+
+.post-meta {
+  color: var(--text);
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.post-meta .label {
+  font-weight: bold;
+  color: #117743;
+}
+
+.post-body {
+  white-space: pre-wrap;
+}
+
+.post-body .greentext {
+  color: var(--green);
+}
+
+.post-img {
+  float: left;
+  margin: 0 12px 6px 0;
+}
+
+.post-img img {
+  display: block;
+  max-width: 250px;
+  max-height: 250px;
+  border: 1px solid var(--post-border);
+}
+
+.post::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+form.compose {
+  background: var(--post-bg);
+  border: 1px solid var(--post-border);
+  padding: 12px;
+  margin: 16px 0;
+  max-width: 600px;
+}
+
+form.compose label {
+  display: block;
+  font-weight: bold;
+  color: var(--text);
+  margin: 8px 0 2px;
+}
+
+form.compose input[type="text"],
+form.compose textarea {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid var(--post-border);
+  font: inherit;
+}
+
+form.compose textarea {
+  min-height: 90px;
+}
+
+button {
+  background: #e0c0b0;
+  border: 1px solid var(--post-border);
+  padding: 5px 14px;
+  font: inherit;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+button:hover {
+  background: #d9bfb7;
+}
+
+a.btn {
+  display: inline-block;
+  background: #e0c0b0;
+  border: 1px solid var(--post-border);
+  padding: 5px 14px;
+  color: var(--body-text);
+  text-decoration: none;
+}
+
+a.btn:hover {
+  background: #d9bfb7;
+  color: var(--body-text);
+}
+
+button.linkish {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: var(--link);
+  text-decoration: underline;
+  font-size: 12px;
+}
+
+.error {
+  background: #ffdddd;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  padding: 8px 12px;
+  margin: 12px 0;
+  max-width: 600px;
+}
+
+.notice {
+  background: #eeffee;
+  border: 1px solid var(--green);
+  padding: 8px 12px;
+  margin: 12px 0;
+  max-width: 600px;
+}
+
+.muted {
+  color: #707070;
+  font-size: 12px;
+}
+
+table.admin {
+  border-collapse: collapse;
+  margin: 12px 0;
+}
+
+table.admin th,
+table.admin td {
+  border: 1px solid var(--post-border);
+  padding: 6px 10px;
+  text-align: left;
+}
+
+table.admin th {
+  background: var(--post-bg);
+  color: var(--text);
+}
+
+.login-box {
+  max-width: 420px;
+  margin: 80px auto;
+  background: var(--post-bg);
+  border: 1px solid var(--post-border);
+  padding: 24px;
+  text-align: center;
+}
