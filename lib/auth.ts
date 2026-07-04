@@ -44,6 +44,8 @@ export function isRootEmail(email: string): boolean {
 }
 
 export async function createSession(userId: string): Promise<void> {
+  // Opportunistic cleanup: expired sessions are dead login-history rows.
+  await db.query("delete from sessions where expires_at < now()");
   const token = randomBytes(32).toString("hex");
   const expiresAt = new Date(Date.now() + SESSION_TTL_DAYS * 24 * 3600 * 1000);
   await db.query(
