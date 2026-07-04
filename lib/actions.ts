@@ -41,7 +41,9 @@ export async function createThread(formData: FormData): Promise<void> {
   const boardPath = `/b/${boardSlug}`;
 
   if (!subject || subject.length > MAX_SUBJECT) fail(boardPath, t.errors.subjectRequired);
-  if (!body || body.length > MAX_BODY) fail(boardPath, t.errors.bodyRequired);
+  if (body.length > MAX_BODY) fail(boardPath, t.errors.bodyTooLong);
+  // A thread needs a title plus at least one of: text, image.
+  if (!body && (!file || file.size === 0)) fail(boardPath, t.errors.emptyPost);
 
   const { rows: boards } = await db.query(
     "select id, archived from boards where slug = $1",
@@ -86,7 +88,8 @@ export async function createReply(formData: FormData): Promise<void> {
   const threadPath = `/b/${threads[0].slug}/${threadId}`;
 
   if (threads[0].locked) fail(threadPath, t.errors.threadLocked);
-  if (!body || body.length > MAX_BODY) fail(threadPath, t.errors.bodyRequired);
+  if (body.length > MAX_BODY) fail(threadPath, t.errors.bodyTooLong);
+  if (!body && (!file || file.size === 0)) fail(threadPath, t.errors.emptyPost);
   await checkRateLimit(user.id, "post").catch(() => fail(threadPath, t.errors.rateLimit));
 
   const hmac = authorHmac(user.id, threadId);

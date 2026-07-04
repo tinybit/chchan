@@ -74,7 +74,7 @@ export default async function ThreadPage({
           <h3>{t.thread.reply}</h3>
           <input type="hidden" name="threadId" value={thread.id} />
           <label htmlFor="body">{t.board.comment}</label>
-          <textarea id="body" name="body" maxLength={8000} required />
+          <textarea id="body" name="body" maxLength={8000} />
           <label htmlFor="image">{t.board.image}</label>
           <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/gif,image/webp" />
           <SubmitButton>{t.thread.postReply}</SubmitButton>

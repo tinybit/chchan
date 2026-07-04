@@ -61,7 +61,7 @@ export default async function BoardPage({
         <label htmlFor="subject">{t.board.subject}</label>
         <input id="subject" name="subject" type="text" maxLength={120} required />
         <label htmlFor="body">{t.board.comment}</label>
-        <textarea id="body" name="body" maxLength={8000} required />
+        <textarea id="body" name="body" maxLength={8000} />
         <label htmlFor="image">{t.board.image}</label>
         <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/gif,image/webp" />
         <SubmitButton>{t.board.postThread}</SubmitButton>
