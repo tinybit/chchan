@@ -15,8 +15,8 @@ export default async function MembersPage({
   const t = await getT();
 
   const { rows: members } = await db.query(
-    `select id, email, role, status from users
-     where status <> 'pending' order by role desc, email`,
+    `select id, coalesce(email, username) as identifier, role, status from users
+     where status <> 'pending' order by role desc, coalesce(email, username)`,
   );
 
   return (
@@ -25,7 +25,7 @@ export default async function MembersPage({
       <table className="admin">
         <thead>
           <tr>
-            <th>{t.admin.email}</th>
+            <th>{t.admin.userCol}</th>
             <th>{t.admin.role}</th>
             <th>{t.admin.status}</th>
             <th>{t.admin.actions}</th>
@@ -34,7 +34,7 @@ export default async function MembersPage({
         <tbody>
           {members.map((m) => (
             <tr key={m.id}>
-              <td>{m.email}</td>
+              <td>{m.identifier}</td>
               <td>{m.role}</td>
               <td>{m.status}</td>
               <td>

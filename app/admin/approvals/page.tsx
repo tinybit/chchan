@@ -11,7 +11,8 @@ export default async function ApprovalsPage({
   const { error } = await searchParams;
   const t = await getT();
   const { rows: pending } = await db.query(
-    "select id, email, created_at from users where status = 'pending' order by created_at",
+    `select id, coalesce(email, username) as identifier, created_at
+     from users where status = 'pending' order by created_at`,
   );
 
   return (
@@ -22,7 +23,7 @@ export default async function ApprovalsPage({
         <table className="admin">
           <thead>
             <tr>
-              <th>{t.admin.email}</th>
+              <th>{t.admin.userCol}</th>
               <th>{t.admin.requested}</th>
               <th>{t.admin.actions}</th>
             </tr>
@@ -30,7 +31,7 @@ export default async function ApprovalsPage({
           <tbody>
             {pending.map((u) => (
               <tr key={u.id}>
-                <td>{u.email}</td>
+                <td>{u.identifier}</td>
                 <td>{formatDate(u.created_at)}</td>
                 <td>
                   <form action={approveUser} style={{ display: "inline" }}>
