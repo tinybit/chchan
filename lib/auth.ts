@@ -1,4 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { db } from "./db";
 
@@ -70,7 +71,8 @@ export async function destroySession(): Promise<void> {
   store.delete(SESSION_COOKIE);
 }
 
-export async function getSessionUser(): Promise<SessionUser | null> {
+/** Memoized per request: layout and page both call this without a second query. */
+export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   if (!token) return null;
   const { rows } = await db.query(
@@ -80,7 +82,7 @@ export async function getSessionUser(): Promise<SessionUser | null> {
     [hashToken(token)],
   );
   return rows.length > 0 ? toSessionUser(rows[0]) : null;
-}
+});
 
 export async function requireApproved(): Promise<SessionUser> {
   const user = await getSessionUser();
