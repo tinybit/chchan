@@ -1,7 +1,25 @@
-import { createHash, randomBytes } from "node:crypto";
+import { createHash, randomBytes, scrypt, timingSafeEqual } from "node:crypto";
+import { promisify } from "node:util";
 import { cache } from "react";
 import { cookies } from "next/headers";
 import { db } from "./db";
+
+const scryptAsync = promisify(scrypt);
+
+/** scrypt with random salt; format "salt:hash", both hex. */
+export async function hashPassword(password: string): Promise<string> {
+  const salt = randomBytes(16);
+  const derived = (await scryptAsync(password, salt, 64)) as Buffer;
+  return `${salt.toString("hex")}:${derived.toString("hex")}`;
+}
+
+export async function verifyPassword(password: string, stored: string): Promise<boolean> {
+  const [saltHex, hashHex] = stored.split(":");
+  if (!saltHex || !hashHex) return false;
+  const derived = (await scryptAsync(password, Buffer.from(saltHex, "hex"), 64)) as Buffer;
+  const expected = Buffer.from(hashHex, "hex");
+  return derived.length === expected.length && timingSafeEqual(derived, expected);
+}
 
 const SESSION_COOKIE = "chchan_session";
 const SESSION_TTL_DAYS = 30;
@@ -10,6 +28,7 @@ export type Role = "member" | "admin" | "root";
 
 export type SessionUser = {
   id: string;
+  /** login identifier for admin views: email (Google) or username (invite). Never shown on the board. */
   email: string;
   status: "pending" | "approved" | "banned";
   role: Role;
@@ -24,14 +43,15 @@ function hashToken(token: string): string {
 
 function toSessionUser(r: {
   id: unknown;
-  email: string;
+  email: string | null;
+  username?: string | null;
   status: SessionUser["status"];
   role: Role;
   rules_accepted_at?: Date | null;
 }): SessionUser {
   return {
     id: String(r.id),
-    email: r.email,
+    email: r.email ?? r.username ?? "",
     status: r.status,
     role: r.role,
     isAdmin: r.role === "admin" || r.role === "root",
@@ -76,7 +96,7 @@ export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   if (!token) return null;
   const { rows } = await db.query(
-    `select u.id, u.email, u.status, u.role, u.rules_accepted_at
+    `select u.id, u.email, u.username, u.status, u.role, u.rules_accepted_at
      from sessions s join users u on u.id = s.user_id
      where s.token_hash = $1 and s.expires_at > now()`,
     [hashToken(token)],

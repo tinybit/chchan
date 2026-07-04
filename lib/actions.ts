@@ -3,7 +3,15 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { db } from "./db";
-import { requireAdmin, requireApproved, requireRoot } from "./auth";
+import { randomBytes } from "node:crypto";
+import {
+  createSession,
+  hashPassword,
+  requireAdmin,
+  requireApproved,
+  requireRoot,
+  verifyPassword,
+} from "./auth";
 import { authorHmac, authorLabel } from "./anon";
 import { checkRateLimit } from "./ratelimit";
 import { processUpload } from "./images";
@@ -137,7 +145,7 @@ export async function reportPost(formData: FormData): Promise<void> {
 async function logMod(
   adminId: string,
   action: string,
-  targetKind: "post" | "thread" | "user" | "board" | "content",
+  targetKind: "post" | "thread" | "user" | "board" | "content" | "invite",
   targetId: string,
   note = "",
 ): Promise<void> {
@@ -344,6 +352,101 @@ export async function reorderBoards(ids: string[]): Promise<void> {
   );
   revalidatePath("/admin/boards");
   revalidatePath("/");
+}
+
+// --- Invite links (any admin) and password registration. ---
+
+const INVITE_TTL_DAYS = 7;
+
+export async function createInvite(): Promise<void> {
+  const admin = await requireAdmin();
+  const token = randomBytes(24).toString("base64url");
+  const expiresAt = new Date(Date.now() + INVITE_TTL_DAYS * 24 * 3600 * 1000);
+  const { rows } = await db.query(
+    "insert into invites (token, created_by, expires_at) values ($1, $2, $3) returning id",
+    [token, admin.id, expiresAt],
+  );
+  await logMod(admin.id, "create-invite", "invite", String(rows[0].id));
+  revalidatePath("/admin/invites");
+  redirect("/admin/invites");
+}
+
+export async function revokeInvite(formData: FormData): Promise<void> {
+  const admin = await requireAdmin();
+  const inviteId = String(formData.get("inviteId") ?? "");
+  // Revoking = marking used without a user, so it can never be redeemed.
+  await db.query(
+    "update invites set used_at = now() where id = $1 and used_at is null",
+    [inviteId],
+  );
+  await logMod(admin.id, "revoke-invite", "invite", inviteId);
+  revalidatePath("/admin/invites");
+  redirect("/admin/invites");
+}
+
+const USERNAME_RE = /^[a-zA-Z0-9_]{3,20}$/;
+
+export async function registerWithInvite(formData: FormData): Promise<void> {
+  const t = await getT();
+  const token = String(formData.get("token") ?? "");
+  const username = String(formData.get("username") ?? "").trim();
+  const password = String(formData.get("password") ?? "");
+  const back = `/join/${encodeURIComponent(token)}`;
+
+  if (!USERNAME_RE.test(username)) fail(back, t.errors.badUsername);
+  if (password.length < 8) fail(back, t.errors.shortPassword);
+
+  const { rows: invites } = await db.query(
+    "select id from invites where token = $1 and used_at is null and expires_at > now()",
+    [token],
+  );
+  if (invites.length === 0) fail(back, t.errors.badInvite);
+
+  const { rows: existing } = await db.query(
+    "select 1 from users where lower(username) = lower($1)",
+    [username],
+  );
+  if (existing.length > 0) fail(back, t.errors.usernameTaken);
+
+  const passwordHash = await hashPassword(password);
+  // Invite is the vetting: new account is approved immediately.
+  const { rows: users } = await db.query(
+    `insert into users (username, password_hash, status, role, approved_at)
+     values ($1, $2, 'approved', 'member', now()) returning id`,
+    [username, passwordHash],
+  );
+  const userId = String(users[0].id);
+  // Burn the invite, racing safely: only succeeds if still unused.
+  const claim = await db.query(
+    "update invites set used_at = now(), used_by = $1 where id = $2 and used_at is null",
+    [userId, invites[0].id],
+  );
+  if ((claim.rowCount ?? 0) === 0) {
+    await db.query("delete from users where id = $1", [userId]);
+    fail(back, t.errors.badInvite);
+  }
+  await createSession(userId);
+  redirect("/rules");
+}
+
+export async function loginWithPassword(formData: FormData): Promise<void> {
+  const t = await getT();
+  const username = String(formData.get("username") ?? "").trim();
+  const password = String(formData.get("password") ?? "");
+
+  const { rows } = await db.query(
+    "select id, password_hash, status from users where lower(username) = lower($1)",
+    [username],
+  );
+  const ok =
+    rows.length > 0 &&
+    rows[0].password_hash &&
+    (await verifyPassword(password, rows[0].password_hash));
+  if (!ok) fail("/login", t.errors.badLogin);
+  if (rows[0].status === "banned") fail("/login", t.errors.badLogin);
+
+  await createSession(String(rows[0].id));
+  redirect("/");
 }
 
 // --- Editable site content (rules page): root only. ---

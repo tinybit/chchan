@@ -670,3 +670,41 @@ table.admin button {
   font: inherit;
   margin: 8px 0 2px;
 }
+
+.cred-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.cred-form input {
+  padding: 7px;
+  border: 1px solid var(--border);
+  background: #fff;
+  font: inherit;
+}
+
+.invite-login {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
+  text-align: left;
+}
+
+.invite-login summary {
+  cursor: pointer;
+  color: var(--link);
+  font-size: 13px;
+}
+
+.invite-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.invite-link code {
+  font-size: 12px;
+  word-break: break-all;
+}

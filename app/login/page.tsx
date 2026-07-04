@@ -1,5 +1,7 @@
 import { getT } from "@/lib/i18n";
+import { loginWithPassword } from "@/lib/actions";
 import { Hero } from "@/components/Hero";
+import { SubmitButton } from "@/components/SubmitButton";
 
 // Deliberately blank: this is the only page the outside world can see,
 // so it explains nothing about what is behind it.
@@ -22,6 +24,14 @@ export default async function LoginPage({
             {t.login.signIn}
           </a>
         </p>
+        <details className="invite-login">
+          <summary>{t.auth.orInvite}</summary>
+          <form className="cred-form" action={loginWithPassword}>
+            <input name="username" type="text" placeholder={t.auth.username} required />
+            <input name="password" type="password" placeholder={t.auth.password} required />
+            <SubmitButton>{t.auth.login}</SubmitButton>
+          </form>
+        </details>
         {devAuth && (
           <form className="dev-login" action="/api/auth/dev-login" method="get">
             <label className="muted" htmlFor="email">

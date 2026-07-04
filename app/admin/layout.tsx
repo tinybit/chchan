@@ -20,6 +20,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const tabs = [
     { href: "/admin/approvals", label: `${t.admin.pendingApprovals} (${pending.rows[0].n})` },
     { href: "/admin/reports", label: `${t.admin.openReports} (${reports.rows[0].n})` },
+    { href: "/admin/invites", label: t.admin.invitesTab },
     ...(user.role === "root"
       ? [
           { href: "/admin/members", label: t.admin.members },
