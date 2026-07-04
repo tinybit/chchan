@@ -181,6 +181,10 @@ h1 {
 
 .post-img {
   float: left;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  max-width: 540px;
   margin: 0 12px 6px 0;
 }
 

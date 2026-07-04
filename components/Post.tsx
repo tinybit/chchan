@@ -5,14 +5,15 @@ import { publicUrl } from "@/lib/storage";
 import { PostImage } from "./PostImage";
 import { ReplyLink } from "./ReplyLink";
 
+export type PostImageRow = { storage_key: string; thumb_key: string };
+
 export type PostRow = {
   id: string;
   body: string;
   author_label: string;
   created_at: Date;
   hidden: boolean;
-  storage_key: string | null;
-  thumb_key: string | null;
+  images: PostImageRow[];
 };
 
 /** Turns >>123 into an anchor link to post 123 on the same page. */
@@ -114,12 +115,15 @@ export async function Post({
         <div className="muted">{t.post.hiddenByMods}</div>
       ) : (
         <>
-          {post.thumb_key && post.storage_key && (
+          {post.images.length > 0 && (
             <div className="post-img">
-              <PostImage
-                thumbSrc={publicUrl(post.thumb_key)}
-                fullSrc={publicUrl(post.storage_key)}
-              />
+              {post.images.map((img) => (
+                <PostImage
+                  key={img.storage_key}
+                  thumbSrc={publicUrl(img.thumb_key)}
+                  fullSrc={publicUrl(img.storage_key)}
+                />
+              ))}
             </div>
           )}
           <Body text={post.body} />

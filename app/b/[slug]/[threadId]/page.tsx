@@ -31,9 +31,16 @@ export default async function ThreadPage({
   const threadPath = `/b/${slug}/${threadId}`;
 
   const { rows: posts } = await db.query(
-    `select p.id, p.body, p.author_label, p.created_at, p.hidden, i.storage_key, i.thumb_key
+    `select p.id, p.body, p.author_label, p.created_at, p.hidden,
+            coalesce(
+              json_agg(json_build_object('storage_key', i.storage_key, 'thumb_key', i.thumb_key)
+                       order by i.id)
+              filter (where i.id is not null),
+              '[]'
+            ) as images
      from posts p left join images i on i.post_id = p.id
      where p.thread_id = $1 and p.deleted_at is null
+     group by p.id
      order by p.id`,
     [threadId],
   );
@@ -76,7 +83,7 @@ export default async function ThreadPage({
           <label htmlFor="body">{t.board.comment}</label>
           <textarea id="body" name="body" maxLength={8000} />
           <label htmlFor="image">{t.board.image}</label>
-          <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/gif,image/webp" />
+          <input id="image" name="image" type="file" multiple accept="image/jpeg,image/png,image/gif,image/webp" />
           <SubmitButton>{t.thread.postReply}</SubmitButton>
         </form>
       )}

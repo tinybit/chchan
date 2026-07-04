@@ -29,11 +29,16 @@ export default async function BoardPage({
   // Archived boards exist only for root (to prepare content before unarchiving).
   if (board.archived && user.role !== "root") notFound();
 
-  // Each thread with its OP post and reply count, newest bump first.
+  // Each thread with its OP post (images aggregated) and reply count.
   const { rows: threads } = await db.query(
     `select t.id as thread_id, t.subject, t.locked,
             p.id, p.body, p.author_label, p.created_at, p.hidden,
-            i.storage_key, i.thumb_key,
+            coalesce(
+              json_agg(json_build_object('storage_key', i.storage_key, 'thumb_key', i.thumb_key)
+                       order by i.id)
+              filter (where i.id is not null),
+              '[]'
+            ) as images,
             (select count(*) - 1 from posts px where px.thread_id = t.id and px.deleted_at is null) as replies
      from threads t
      join lateral (
@@ -41,6 +46,8 @@ export default async function BoardPage({
      ) p on true
      left join images i on i.post_id = p.id
      where t.board_id = $1 and t.deleted_at is null
+     group by t.id, t.subject, t.locked, t.bumped_at,
+              p.id, p.body, p.author_label, p.created_at, p.hidden
      order by t.bumped_at desc
      limit 50`,
     [board.id],
@@ -63,7 +70,7 @@ export default async function BoardPage({
         <label htmlFor="body">{t.board.comment}</label>
         <textarea id="body" name="body" maxLength={8000} />
         <label htmlFor="image">{t.board.image}</label>
-        <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/gif,image/webp" />
+        <input id="image" name="image" type="file" multiple accept="image/jpeg,image/png,image/gif,image/webp" />
         <SubmitButton>{t.board.postThread}</SubmitButton>
       </form>
 

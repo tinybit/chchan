@@ -16,19 +16,29 @@ function fail(path: string, message: string): never {
   redirect(`${path}?error=${encodeURIComponent(message)}`);
 }
 
-async function attachImage(postId: string, file: File | null, errPath: string): Promise<void> {
-  if (!file || file.size === 0) return;
-  let img;
-  try {
-    img = await processUpload(file);
-  } catch {
-    fail(errPath, (await getT()).errors.image);
+const MAX_IMAGES = 4;
+
+function realFiles(formData: FormData): File[] {
+  return (formData.getAll("image") as File[]).filter((f) => f && f.size > 0);
+}
+
+async function attachImages(postId: string, files: File[], errPath: string): Promise<void> {
+  if (files.length === 0) return;
+  const t = await getT();
+  if (files.length > MAX_IMAGES) fail(errPath, t.errors.tooManyImages);
+  for (const file of files) {
+    let img;
+    try {
+      img = await processUpload(file);
+    } catch {
+      fail(errPath, t.errors.image);
+    }
+    await db.query(
+      `insert into images (post_id, storage_key, thumb_key, mime, bytes, width, height)
+       values ($1, $2, $3, $4, $5, $6, $7)`,
+      [postId, img.storageKey, img.thumbKey, img.mime, img.bytes, img.width, img.height],
+    );
   }
-  await db.query(
-    `insert into images (post_id, storage_key, thumb_key, mime, bytes, width, height)
-     values ($1, $2, $3, $4, $5, $6, $7)`,
-    [postId, img.storageKey, img.thumbKey, img.mime, img.bytes, img.width, img.height],
-  );
 }
 
 export async function createThread(formData: FormData): Promise<void> {
@@ -37,13 +47,13 @@ export async function createThread(formData: FormData): Promise<void> {
   const boardSlug = String(formData.get("board") ?? "");
   const subject = String(formData.get("subject") ?? "").trim();
   const body = String(formData.get("body") ?? "").trim();
-  const file = formData.get("image") as File | null;
+  const files = realFiles(formData);
   const boardPath = `/b/${boardSlug}`;
 
   if (!subject || subject.length > MAX_SUBJECT) fail(boardPath, t.errors.subjectRequired);
   if (body.length > MAX_BODY) fail(boardPath, t.errors.bodyTooLong);
-  // A thread needs a title plus at least one of: text, image.
-  if (!body && (!file || file.size === 0)) fail(boardPath, t.errors.emptyPost);
+  // A thread needs a title plus at least one of: text, images.
+  if (!body && files.length === 0) fail(boardPath, t.errors.emptyPost);
 
   const { rows: boards } = await db.query(
     "select id, archived from boards where slug = $1",
@@ -64,7 +74,7 @@ export async function createThread(formData: FormData): Promise<void> {
     "insert into posts (thread_id, body, author_label, author_hmac) values ($1, $2, $3, $4) returning id",
     [threadId, body, authorLabel(hmac), hmac],
   );
-  await attachImage(String(posts[0].id), file, boardPath);
+  await attachImages(String(posts[0].id), files, boardPath);
 
   revalidatePath(boardPath);
   redirect(`${boardPath}/${threadId}`);
@@ -75,7 +85,7 @@ export async function createReply(formData: FormData): Promise<void> {
   const t = await getT();
   const threadId = String(formData.get("threadId") ?? "");
   const body = String(formData.get("body") ?? "").trim();
-  const file = formData.get("image") as File | null;
+  const files = realFiles(formData);
 
   const { rows: threads } = await db.query(
     `select t.id, t.locked, b.slug, b.archived from threads t join boards b on b.id = t.board_id
@@ -89,7 +99,7 @@ export async function createReply(formData: FormData): Promise<void> {
 
   if (threads[0].locked) fail(threadPath, t.errors.threadLocked);
   if (body.length > MAX_BODY) fail(threadPath, t.errors.bodyTooLong);
-  if (!body && (!file || file.size === 0)) fail(threadPath, t.errors.emptyPost);
+  if (!body && files.length === 0) fail(threadPath, t.errors.emptyPost);
   await checkRateLimit(user.id, "post").catch(() => fail(threadPath, t.errors.rateLimit));
 
   const hmac = authorHmac(user.id, threadId);
@@ -97,7 +107,7 @@ export async function createReply(formData: FormData): Promise<void> {
     "insert into posts (thread_id, body, author_label, author_hmac) values ($1, $2, $3, $4) returning id",
     [threadId, body, authorLabel(hmac), hmac],
   );
-  await attachImage(String(posts[0].id), file, threadPath);
+  await attachImages(String(posts[0].id), files, threadPath);
   await db.query("update threads set bumped_at = now() where id = $1", [threadId]);
 
   revalidatePath(threadPath);
