@@ -13,10 +13,10 @@ alter table mod_actions add constraint mod_actions_target_kind_check
 insert into site_content (key, html) values
 ('rules_en', $HTML$<h1>Rules and the honest fine print</h1>
 <h2>What this is</h2>
-<p>An unofficial anonymous board for ClickHouse folks, run as a pet project. It is not a company system, not endorsed by anyone, and not moderated by HR.</p>
+<p>An unofficial anonymous board for coworkers, run as a pet project. It is not a company system, not endorsed by anyone, and not moderated by HR.</p>
 <h2>How anonymity works here</h2>
 <ul>
-<li><p>Google sign-in is used once, to verify you are @clickhouse.com and approve you.</p></li>
+<li><p>Google sign-in is used once, to verify your work email and approve you.</p></li>
 <li><p>Posts are <strong>not</strong> linked to your account. The database stores no author id on posts — only a per-thread anonymous label derived from a keyed hash.</p></li>
 <li><p>Admins have no “who wrote this” button and no routine way to find out.</p></li>
 <li><p>Uploaded images are re-encoded and all metadata (EXIF, GPS) is stripped.</p></li>
@@ -40,10 +40,10 @@ insert into site_content (key, html) values
 <p>Threats, doxxing, confidential leaks, or illegal content: the post comes down first, questions after. Everything else: report it and the mods will look when they look.</p>$HTML$),
 ('rules_ru', $HTML$<h1>Правила и честный мелкий шрифт</h1>
 <h2>Что это такое</h2>
-<p>Неофициальная анонимная борда для своих из ClickHouse, пет-проект. Это не корпоративная система, никем не одобрена и не модерируется HR.</p>
+<p>Неофициальная анонимная борда для своих, пет-проект. Это не корпоративная система, никем не одобрена и не модерируется HR.</p>
 <h2>Как тут работает анонимность</h2>
 <ul>
-<li><p>Вход через Google нужен один раз — проверить, что ты из @clickhouse.com, и одобрить заявку.</p></li>
+<li><p>Вход через Google нужен один раз — проверить рабочую почту и одобрить заявку.</p></li>
 <li><p>Посты <strong>не</strong> привязаны к аккаунту. В базе у поста нет автора — только анонимная метка внутри треда, полученная из хэша с ключом.</p></li>
 <li><p>У админов нет кнопки «кто это написал» и нет обычного способа это узнать.</p></li>
 <li><p>Загруженные картинки перекодируются, все метаданные (EXIF, GPS) вырезаются.</p></li>

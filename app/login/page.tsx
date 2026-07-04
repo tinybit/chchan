@@ -27,7 +27,7 @@ export default async function LoginPage({
             <label className="muted" htmlFor="email">
               {t.login.devLogin}
             </label>
-            <input id="email" name="email" type="text" placeholder="someone@clickhouse.com" />
+            <input id="email" name="email" type="text" placeholder="anon@example.com" />
             <button type="submit">dev login</button>
           </form>
         )}

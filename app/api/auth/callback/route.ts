@@ -43,7 +43,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     Buffer.from(idToken.split(".")[1], "base64url").toString(),
   ) as IdTokenClaims;
 
-  const allowedDomain = process.env.ALLOWED_EMAIL_DOMAIN ?? "clickhouse.com";
+  // No fallback: unset domain means nobody but the root email gets in.
+  const allowedDomain = process.env.ALLOWED_EMAIL_DOMAIN ?? "";
   // hd is the load-bearing check: the hd URL parameter on the auth request is
   // cosmetic and any Google account can reach this callback without it.
   // Exactly one non-domain account is allowed in: the configured root email.
