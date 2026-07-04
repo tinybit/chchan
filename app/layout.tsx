@@ -4,7 +4,9 @@ import "./globals.css";
 import { getSessionUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getLang, getT } from "@/lib/i18n";
+import { getTheme } from "@/lib/theme";
 import { WatchIndicator } from "@/components/WatchIndicator";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const metadata: Metadata = {
   title: "ChChan",
@@ -12,7 +14,12 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [user, lang, t] = await Promise.all([getSessionUser(), getLang(), getT()]);
+  const [user, lang, t, theme] = await Promise.all([
+    getSessionUser(),
+    getLang(),
+    getT(),
+    getTheme(),
+  ]);
   const approved = user?.status === "approved";
   const boards = approved
     ? (
@@ -24,7 +31,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   // Outsiders get a bare page: no nav, no board names, no hints.
   return (
-    <html lang={lang}>
+    <html lang={lang} data-theme={theme}>
       <body>
         <header className="site">
           <Link href="/" className="logo">
@@ -42,6 +49,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <span className="spacer" />
           <nav>
             {approved && <WatchIndicator label={t.watch.updates} emptyLabel={t.watch.none} />}
+            <ThemeToggle initial={theme} />
             <a
               className={`flag${lang === "ru" ? " active" : ""}`}
               href="/api/lang?code=ru"
