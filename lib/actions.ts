@@ -82,10 +82,12 @@ export async function createThread(formData: FormData): Promise<void> {
     "insert into posts (thread_id, body, author_label, author_hmac) values ($1, $2, $3, $4) returning id",
     [threadId, body, authorLabel(hmac), hmac],
   );
-  await attachImages(String(posts[0].id), files, boardPath);
+  const postId = String(posts[0].id);
+  await attachImages(postId, files, boardPath);
 
   revalidatePath(boardPath);
-  redirect(`${boardPath}/${threadId}`);
+  // posted=<id> lets the browser record this as the reader's own post.
+  redirect(`${boardPath}/${threadId}?posted=${postId}`);
 }
 
 export async function createReply(formData: FormData): Promise<void> {
@@ -115,11 +117,12 @@ export async function createReply(formData: FormData): Promise<void> {
     "insert into posts (thread_id, body, author_label, author_hmac) values ($1, $2, $3, $4) returning id",
     [threadId, body, authorLabel(hmac), hmac],
   );
-  await attachImages(String(posts[0].id), files, threadPath);
+  const postId = String(posts[0].id);
+  await attachImages(postId, files, threadPath);
   await db.query("update threads set bumped_at = now() where id = $1", [threadId]);
 
   revalidatePath(threadPath);
-  redirect(threadPath);
+  redirect(`${threadPath}?posted=${postId}#p${postId}`);
 }
 
 export async function acceptRules(): Promise<void> {

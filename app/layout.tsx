@@ -4,6 +4,7 @@ import "./globals.css";
 import { getSessionUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getLang, getT } from "@/lib/i18n";
+import { WatchIndicator } from "@/components/WatchIndicator";
 
 export const metadata: Metadata = {
   title: "ChChan",
@@ -40,6 +41,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           )}
           <span className="spacer" />
           <nav>
+            {approved && <WatchIndicator label={t.watch.updates} emptyLabel={t.watch.none} />}
             <a
               className={`flag${lang === "ru" ? " active" : ""}`}
               href="/api/lang?code=ru"

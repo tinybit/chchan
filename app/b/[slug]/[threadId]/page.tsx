@@ -6,6 +6,7 @@ import { createReply, lockThread } from "@/lib/actions";
 import { getT } from "@/lib/i18n";
 import { Post, type PostRow } from "@/components/Post";
 import { SubmitButton } from "@/components/SubmitButton";
+import { ThreadClient } from "@/components/ThreadClient";
 
 export default async function ThreadPage({
   params,
@@ -49,6 +50,15 @@ export default async function ThreadPage({
     <main>
       <div className="toolbar">
         <Link href={`/b/${slug}`}>{t.thread.backTo(slug)}</Link>
+        <ThreadClient
+          threadId={String(thread.id)}
+          slug={slug}
+          title={thread.subject}
+          postIds={posts.map((p) => String(p.id))}
+          youLabel={t.thread.you}
+          watchLabel={t.thread.watch}
+          unwatchLabel={t.thread.unwatch}
+        />
         {user.isAdmin && (
           <form action={lockThread} style={{ display: "inline", marginLeft: 12 }}>
             <input type="hidden" name="threadId" value={thread.id} />

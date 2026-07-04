@@ -50,6 +50,13 @@ const en = {
     unlock: "unlock thread",
     reply: "Reply",
     postReply: "Post reply",
+    watch: "watch",
+    unwatch: "unwatch",
+    you: "(You)",
+  },
+  watch: {
+    updates: "updates",
+    none: "no updates",
   },
   post: {
     anon: "Anon",
@@ -203,6 +210,13 @@ const ru: Dict = {
     unlock: "открыть тред",
     reply: "Ответить",
     postReply: "Отправить",
+    watch: "следить",
+    unwatch: "не следить",
+    you: "(Ты)",
+  },
+  watch: {
+    updates: "обновления",
+    none: "нет обновлений",
   },
   post: {
     anon: "Анон",
