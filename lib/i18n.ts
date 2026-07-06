@@ -332,7 +332,8 @@ const dicts: Record<Lang, Dict> = { en, ru };
 
 export async function getLang(): Promise<Lang> {
   const value = (await cookies()).get("lang")?.value;
-  return value === "en" ? "en" : "ru";
+  // English unless the user explicitly picked Russian.
+  return value === "ru" ? "ru" : "en";
 }
 
 export async function getT(): Promise<Dict> {
