@@ -59,9 +59,13 @@ function toSessionUser(r: {
   };
 }
 
+/** ROOT_EMAIL may be a comma-separated list; any match is root. */
 export function isRootEmail(email: string): boolean {
-  const root = (process.env.ROOT_EMAIL ?? "").trim().toLowerCase();
-  return root !== "" && email.toLowerCase() === root;
+  const roots = (process.env.ROOT_EMAIL ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  return roots.includes(email.toLowerCase());
 }
 
 export async function createSession(userId: string): Promise<void> {
