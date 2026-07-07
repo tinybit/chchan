@@ -738,11 +738,18 @@ table.admin button {
   margin: 10px 0;
 }
 
-.modal-form input {
+.modal-form input,
+.modal-form textarea {
   padding: 6px;
   border: 1px solid var(--border);
   background: var(--field-bg);
+  color: var(--text);
   font: inherit;
+}
+
+.modal-form textarea {
+  min-height: 200px;
+  resize: vertical;
 }
 
 .modal-actions {

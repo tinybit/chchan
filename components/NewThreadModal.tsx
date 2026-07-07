@@ -32,7 +32,7 @@ export function NewThreadModal({ slug, labels }: { slug: string; labels: NewThre
   return (
     <>
       <button type="button" className="btn-create" onClick={() => setOpen(true)}>
-        + {labels.create}
+        {labels.create}
       </button>
 
       {open && (
