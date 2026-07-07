@@ -16,7 +16,9 @@ export default async function MembersPage({
 
   const { rows: members } = await db.query(
     `select id, coalesce(email, username) as identifier, role, status from users
-     where status <> 'pending' order by role desc, coalesce(email, username)`,
+     where status <> 'pending'
+     order by case role when 'root' then 0 when 'admin' then 1 else 2 end,
+              coalesce(email, username)`,
   );
 
   return (
