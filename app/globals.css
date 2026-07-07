@@ -884,3 +884,12 @@ table.admin button {
   font-size: 12px;
   word-break: break-all;
 }
+
+/* Mobile overrides that must win over earlier base rules (same specificity,
+   so they have to come last in source order). */
+@media (max-width: 560px) {
+  .post-img {
+    float: none;
+    margin: 0 0 6px 0;
+  }
+}
