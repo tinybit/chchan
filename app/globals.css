@@ -159,18 +159,22 @@ h1 {
 
 .board-head {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
+  margin: 16px 0;
 }
 
 .board-head h1 {
-  margin-bottom: 2px;
+  margin: 0 0 2px;
+}
+
+.board-head p {
+  margin: 0;
 }
 
 .btn-create {
-  margin-top: 6px;
   padding: 8px 18px;
   background: #3fa34d;
   color: #fff;
