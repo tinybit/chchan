@@ -36,7 +36,7 @@ export default async function MembersPage({
         <tbody>
           {members.map((m) => (
             <tr key={m.id}>
-              <td>{m.identifier}</td>
+              <td className={`role-${m.role}`}>{m.identifier}</td>
               <td>
                 <span className={`role-badge role-${m.role}`}>{m.role}</span>
               </td>
