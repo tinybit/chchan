@@ -51,18 +51,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             {approved && <WatchIndicator label={t.watch.updates} emptyLabel={t.watch.none} />}
             <ThemeToggle initial={theme} />
             <a
-              className={`flag${lang === "ru" ? " active" : ""}`}
-              href="/api/lang?code=ru"
-              title="Русский"
-            >
-              🇷🇺
-            </a>
-            <a
               className={`flag${lang === "en" ? " active" : ""}`}
               href="/api/lang?code=en"
               title="English"
             >
               🇺🇸
+            </a>
+            <a
+              className={`flag${lang === "ru" ? " active" : ""}`}
+              href="/api/lang?code=ru"
+              title="Русский"
+            >
+              🇷🇺
             </a>
             {approved && <Link href="/rules">{t.nav.rules}</Link>}
             {approved && user?.isAdmin && <Link href="/admin">{t.nav.admin}</Link>}
