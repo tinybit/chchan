@@ -883,7 +883,7 @@ table.admin button {
 
 .login-box {
   max-width: 420px;
-  margin: 24px auto 16px;
+  margin: 24px auto 36px;
   background: var(--post-bg);
   border: 1px solid var(--border);
   padding: 24px;
