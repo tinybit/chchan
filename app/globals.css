@@ -208,12 +208,20 @@ h1 {
 }
 
 /* Space out the action links (report / reply / hide / delete / ban). */
-.post-meta form {
+.post-actions form,
+.post-actions > .linkish {
   margin-left: 10px;
 }
 
-.post-meta > .linkish {
-  margin-left: 10px;
+/* On narrow screens the whole action group drops below the identity line. */
+@media (max-width: 560px) {
+  .post-actions {
+    display: block;
+    margin-top: 3px;
+  }
+  .post-actions form:first-child {
+    margin-left: 0;
+  }
 }
 
 .post-body {

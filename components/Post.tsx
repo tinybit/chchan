@@ -65,29 +65,32 @@ export async function Post({
   return (
     <div className="post" id={`p${post.id}`}>
       <div className="post-meta">
-        <span className="label">
-          {t.post.anon} {post.author_label}
-        </span>{" "}
-        {formatDate(post.created_at)} No.{post.id}
-        {post.hidden && isAdmin && <b>{t.post.hiddenTag}</b>}{" "}
-        <form action={reportPost} style={{ display: "inline" }}>
-          <input type="hidden" name="postId" value={post.id} />
-          <input type="hidden" name="reason" value="report" />
-          <input type="hidden" name="backPath" value={backPath} />
-          <button className="linkish" type="submit">
-            {t.post.report}
-          </button>
-        </form>
-        {canReply && (
-          <>
-            {" "}
-            <ReplyLink postId={post.id} label={t.post.reply} />
-          </>
-        )}
-        {isAdmin && (
-          <>
-            {" "}
-            <form action={hidePost} style={{ display: "inline" }}>
+        <span className="post-ident">
+          <span className="label">
+            {t.post.anon} {post.author_label}
+          </span>{" "}
+          {formatDate(post.created_at)} No.{post.id}
+          {post.hidden && isAdmin && <b>{t.post.hiddenTag}</b>}
+        </span>
+        <span className="post-actions">
+          <form action={reportPost} style={{ display: "inline" }}>
+            <input type="hidden" name="postId" value={post.id} />
+            <input type="hidden" name="reason" value="report" />
+            <input type="hidden" name="backPath" value={backPath} />
+            <button className="linkish" type="submit">
+              {t.post.report}
+            </button>
+          </form>
+          {canReply && (
+            <>
+              {" "}
+              <ReplyLink postId={post.id} label={t.post.reply} />
+            </>
+          )}
+          {isAdmin && (
+            <>
+              {" "}
+              <form action={hidePost} style={{ display: "inline" }}>
               <input type="hidden" name="postId" value={post.id} />
               <input type="hidden" name="backPath" value={backPath} />
               <button className="linkish" type="submit">
@@ -108,8 +111,9 @@ export async function Post({
                 {t.post.banAuthor}
               </button>
             </form>
-          </>
-        )}
+            </>
+          )}
+        </span>
       </div>
       {hiddenForUser ? (
         <div className="muted">{t.post.hiddenByMods}</div>
