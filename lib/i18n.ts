@@ -16,6 +16,7 @@ const en = {
   nav: { rules: "rules", admin: "admin", logout: "logout" },
   login: {
     signIn: "Sign in with Google",
+    sourceCode: "source code",
     devLogin: "dev login (local only)",
     errors: {
       oauth: "Sign-in failed. Try again.",
@@ -179,6 +180,7 @@ const ru: Dict = {
   nav: { rules: "правила", admin: "админка", logout: "выйти" },
   login: {
     signIn: "Войти через Google",
+    sourceCode: "исходный код",
     devLogin: "dev-вход (только локально)",
     errors: {
       oauth: "Не получилось войти. Попробуй ещё раз.",

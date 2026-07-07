@@ -42,6 +42,11 @@ export default async function LoginPage({
           </form>
         )}
       </div>
+      <p className="source-link">
+        <a href="https://github.com/tinybit/chchan" target="_blank" rel="noopener noreferrer">
+          {t.login.sourceCode}
+        </a>
+      </p>
     </div>
   );
 }
