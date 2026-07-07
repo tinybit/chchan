@@ -329,6 +329,31 @@ form.compose input[type="file"] {
   margin-top: 2px;
 }
 
+.uploader {
+  margin-top: 8px;
+}
+
+.uploader input[type="file"] {
+  display: block;
+  font: inherit;
+  margin-top: 4px;
+}
+
+.uploader-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+  font-size: 13px;
+}
+
+.uploader-item .uploader-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 260px;
+}
+
 button {
   background: var(--btn-bg);
   border: 1px solid var(--btn-border);

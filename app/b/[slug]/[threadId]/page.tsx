@@ -7,6 +7,7 @@ import { getT } from "@/lib/i18n";
 import { Post, type PostRow } from "@/components/Post";
 import { SubmitButton } from "@/components/SubmitButton";
 import { ThreadClient } from "@/components/ThreadClient";
+import { ImageUploader } from "@/components/ImageUploader";
 
 export default async function ThreadPage({
   params,
@@ -92,8 +93,7 @@ export default async function ThreadPage({
           <input type="hidden" name="threadId" value={thread.id} />
           <label htmlFor="body">{t.board.comment}</label>
           <textarea id="body" name="body" maxLength={8000} />
-          <label htmlFor="image">{t.board.image}</label>
-          <input id="image" name="image" type="file" multiple accept="image/jpeg,image/png,image/gif,image/webp" />
+          <ImageUploader label={t.board.image} />
           <SubmitButton>{t.thread.postReply}</SubmitButton>
         </form>
       )}

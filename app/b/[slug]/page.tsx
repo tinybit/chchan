@@ -7,6 +7,7 @@ import { getLang, getT } from "@/lib/i18n";
 import { boardName, boardDescription } from "@/lib/boards";
 import { Post, type PostRow } from "@/components/Post";
 import { SubmitButton } from "@/components/SubmitButton";
+import { ImageUploader } from "@/components/ImageUploader";
 
 export default async function BoardPage({
   params,
@@ -69,8 +70,7 @@ export default async function BoardPage({
         <input id="subject" name="subject" type="text" maxLength={120} required />
         <label htmlFor="body">{t.board.comment}</label>
         <textarea id="body" name="body" maxLength={8000} />
-        <label htmlFor="image">{t.board.image}</label>
-        <input id="image" name="image" type="file" multiple accept="image/jpeg,image/png,image/gif,image/webp" />
+        <ImageUploader label={t.board.image} />
         <SubmitButton>{t.board.postThread}</SubmitButton>
       </form>
 
