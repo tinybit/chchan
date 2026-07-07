@@ -361,15 +361,26 @@ export async function reorderBoards(ids: string[]): Promise<void> {
 
 const INVITE_TTL_DAYS = 7;
 
-export async function createInvite(): Promise<void> {
+export async function createInvites(formData: FormData): Promise<void> {
   const admin = await requireAdmin();
-  const token = randomBytes(24).toString("base64url");
+  const count = Math.min(Math.max(Math.floor(Number(formData.get("count") ?? 1)) || 1, 1), 50);
   const expiresAt = new Date(Date.now() + INVITE_TTL_DAYS * 24 * 3600 * 1000);
-  const { rows } = await db.query(
-    "insert into invites (token, created_by, expires_at) values ($1, $2, $3) returning id",
-    [token, admin.id, expiresAt],
+  const ids: string[] = [];
+  for (let i = 0; i < count; i++) {
+    const token = randomBytes(24).toString("base64url");
+    const { rows } = await db.query(
+      "insert into invites (token, created_by, expires_at) values ($1, $2, $3) returning id",
+      [token, admin.id, expiresAt],
+    );
+    ids.push(String(rows[0].id));
+  }
+  await logMod(
+    admin.id,
+    count > 1 ? "create-invites" : "create-invite",
+    "invite",
+    ids[0] ?? "0",
+    count > 1 ? `${count} invites` : "",
   );
-  await logMod(admin.id, "create-invite", "invite", String(rows[0].id));
   revalidatePath("/admin/invites");
   redirect("/admin/invites");
 }

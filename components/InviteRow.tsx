@@ -2,6 +2,23 @@
 
 import { useState } from "react";
 
+export function DownloadInvites({ links, label }: { links: string[]; label: string }) {
+  function download() {
+    const blob = new Blob([links.join("\n") + "\n"], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `chchan-invites-${new Date().toISOString().slice(0, 10)}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+  return (
+    <button type="button" onClick={download}>
+      {label} ({links.length})
+    </button>
+  );
+}
+
 export function CopyLink({ url, copyLabel }: { url: string; copyLabel: string }) {
   const [copied, setCopied] = useState(false);
   return (

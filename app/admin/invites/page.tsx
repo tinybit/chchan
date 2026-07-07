@@ -3,9 +3,9 @@ import { db } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { formatDate } from "@/lib/dates";
 import { getT } from "@/lib/i18n";
-import { createInvite, revokeInvite } from "@/lib/actions";
+import { createInvites, revokeInvite } from "@/lib/actions";
 import { SubmitButton } from "@/components/SubmitButton";
-import { CopyLink } from "@/components/InviteRow";
+import { CopyLink, DownloadInvites } from "@/components/InviteRow";
 
 export default async function InvitesPage() {
   const user = await getSessionUser();
@@ -13,9 +13,12 @@ export default async function InvitesPage() {
   const t = await getT();
   const appUrl = process.env.APP_URL ?? "";
 
+  // Active (unused, unexpired) invites first, then the rest.
   const { rows: invites } = await db.query(
     `select id, token, created_at, expires_at, used_at, used_by
-     from invites order by created_at desc limit 100`,
+     from invites
+     order by (used_at is null and expires_at > now()) desc, created_at desc
+     limit 200`,
   );
 
   function status(inv: (typeof invites)[number]): string {
@@ -25,12 +28,26 @@ export default async function InvitesPage() {
     return t.admin.inviteActive;
   }
 
+  const activeLinks = invites
+    .filter((inv) => !inv.used_at && new Date(inv.expires_at) >= new Date())
+    .map((inv) => `${appUrl}/join/${inv.token}`);
+
   return (
     <>
       <p className="muted">{t.admin.inviteHint}</p>
-      <form action={createInvite}>
-        <SubmitButton>{t.admin.newInvite}</SubmitButton>
-      </form>
+      <div className="invite-actions">
+        <form action={createInvites} style={{ display: "inline" }}>
+          <input type="hidden" name="count" value="1" />
+          <SubmitButton>{t.admin.newInvite}</SubmitButton>
+        </form>
+        <form action={createInvites} style={{ display: "inline" }}>
+          <input type="hidden" name="count" value="10" />
+          <SubmitButton>{t.admin.newInvites10}</SubmitButton>
+        </form>
+        {activeLinks.length > 0 && (
+          <DownloadInvites links={activeLinks} label={t.admin.downloadInvites} />
+        )}
+      </div>
 
       <table className="admin" style={{ marginTop: 16 }}>
         <thead>

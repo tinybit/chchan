@@ -525,6 +525,13 @@ table.admin button {
   margin-top: 0;
 }
 
+.invite-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
 .role-badge {
   font-weight: bold;
   text-transform: uppercase;
