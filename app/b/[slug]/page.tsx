@@ -2,12 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { guardApproved } from "@/lib/guard";
-import { createThread } from "@/lib/actions";
 import { getLang, getT } from "@/lib/i18n";
 import { boardName, boardDescription } from "@/lib/boards";
 import { Post, type PostRow } from "@/components/Post";
-import { SubmitButton } from "@/components/SubmitButton";
-import { ImageUploader } from "@/components/ImageUploader";
+import { NewThreadModal } from "@/components/NewThreadModal";
 
 export default async function BoardPage({
   params,
@@ -56,23 +54,28 @@ export default async function BoardPage({
 
   return (
     <main>
-      <h1>
-        /{board.slug}/ - {boardName(board, lang)}
-      </h1>
-      <p className="muted">{boardDescription(board, lang)}</p>
+      <div className="board-head">
+        <div>
+          <h1>
+            /{board.slug}/ - {boardName(board, lang)}
+          </h1>
+          <p className="muted">{boardDescription(board, lang)}</p>
+        </div>
+        <NewThreadModal
+          slug={board.slug}
+          labels={{
+            create: t.board.createThread,
+            newThread: t.board.newThread,
+            subject: t.board.subject,
+            comment: t.board.comment,
+            image: t.board.image,
+            post: t.board.postThread,
+            cancel: t.admin.cancel,
+          }}
+        />
+      </div>
       {error && <div className="error">{error}</div>}
       {notice && <div className="notice">{notice}</div>}
-
-      <form className="compose" action={createThread}>
-        <h3>{t.board.newThread}</h3>
-        <input type="hidden" name="board" value={board.slug} />
-        <label htmlFor="subject">{t.board.subject}</label>
-        <input id="subject" name="subject" type="text" maxLength={120} required />
-        <label htmlFor="body">{t.board.comment}</label>
-        <textarea id="body" name="body" maxLength={8000} />
-        <ImageUploader label={t.board.image} />
-        <SubmitButton>{t.board.postThread}</SubmitButton>
-      </form>
 
       {threads.map((th) => (
         <div className="thread" key={th.thread_id}>

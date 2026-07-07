@@ -35,6 +35,7 @@ const en = {
     threads: (n: number) => (n === 1 ? "1 thread" : `${n} threads`),
   },
   board: {
+    createThread: "Create thread",
     newThread: "New thread",
     subject: "Subject",
     comment: "Comment",
@@ -197,6 +198,7 @@ const ru: Dict = {
     threads: (n: number) => ruPlural(n, "тред", "треда", "тредов"),
   },
   board: {
+    createThread: "Создать тред",
     newThread: "Новый тред",
     subject: "Тема",
     comment: "Комментарий",
