@@ -525,6 +525,25 @@ table.admin button {
   margin-top: 0;
 }
 
+.role-badge {
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+.role-root {
+  color: #cc1105;
+}
+
+.role-admin {
+  color: var(--link);
+}
+
+.role-member {
+  color: var(--muted);
+}
+
 .tabs {
   display: flex;
   gap: 4px;

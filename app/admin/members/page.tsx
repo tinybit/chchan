@@ -37,7 +37,9 @@ export default async function MembersPage({
           {members.map((m) => (
             <tr key={m.id}>
               <td>{m.identifier}</td>
-              <td>{m.role}</td>
+              <td>
+                <span className={`role-badge role-${m.role}`}>{m.role}</span>
+              </td>
               <td>{m.status}</td>
               <td>
                 {m.role !== "root" && m.status === "approved" && (
