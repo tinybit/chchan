@@ -46,10 +46,12 @@ export async function processUpload(file: File): Promise<ProcessedImage> {
     mime = "image/jpeg";
   }
 
+  // Larger preview so it stays crisp when shown near full width on phones
+  // (and downscales cleanly on desktop). Clicking still opens the full image.
   const thumb = await sharp(input)
     .rotate()
-    .resize(250, 250, { fit: "inside", withoutEnlargement: true })
-    .jpeg({ quality: 80 })
+    .resize(900, 900, { fit: "inside", withoutEnlargement: true })
+    .jpeg({ quality: 82 })
     .toBuffer();
 
   const id = randomBytes(16).toString("hex");
